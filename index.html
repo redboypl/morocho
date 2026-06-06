@@ -201,6 +201,100 @@
     th:nth-child(3) { width: 90px; }
     th:nth-child(4) { width: 150px; }
     th:nth-child(5) { }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 1rem 0.85rem 2rem;
+      }
+
+      header {
+        padding: 0 0.25rem;
+      }
+      header h1 {
+        font-size: 1.35rem;
+      }
+      header p {
+        font-size: 0.82rem;
+      }
+
+      .controls {
+        width: 100%;
+        padding: 0 0.25rem;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .controls label {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+      .controls select,
+      .controls input[type="text"] {
+        width: 100%;
+      }
+
+      .card {
+        border-radius: 16px;
+      }
+
+      table {
+        display: block;
+      }
+      thead {
+        display: none;
+      }
+      tbody {
+        display: block;
+      }
+      tr {
+        display: grid;
+        grid-template-columns: minmax(40px, 60px) 1fr;
+        gap: 0.75rem;
+        padding: 0.95rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:last-child {
+        border-bottom: none;
+      }
+      td {
+        display: block;
+        padding: 0;
+        min-width: 0;
+      }
+      td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.72rem;
+        color: var(--muted);
+        margin-bottom: 0.35rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      td:nth-child(1)::before {
+        content: "Grupo";
+      }
+      td:nth-child(2) {
+        font-size: 0.95rem;
+      }
+      td:nth-child(3),
+      td:nth-child(4),
+      td:nth-child(5) {
+        font-size: 0.82rem;
+      }
+      .match-name {
+        white-space: normal;
+      }
+      .time-cell,
+      .venue {
+        white-space: normal;
+      }
+      .date-sub {
+        display: inline-block;
+        margin-top: 0.15rem;
+      }
+      .tags {
+        gap: 6px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -368,14 +462,14 @@ function render() {
 
   tbody.innerHTML = filtered.map(m => `
     <tr>
-      <td><span class="grp">${m.g}</span></td>
-      <td class="match-name">${m.home} <span class="vs">vs</span> ${m.away}</td>
-      <td class="time-cell">
+      <td data-label="Gr."><span class="grp">${m.g}</span></td>
+      <td data-label="Partido" class="match-name">${m.home} <span class="vs">vs</span> ${m.away}</td>
+      <td data-label="Hora VET" class="time-cell">
         ${m.time}<br>
         <span class="date-sub">${m.date}</span>
       </td>
-      <td class="venue">${m.venue}</td>
-      <td><div class="tags">${buildTags()}</div></td>
+      <td data-label="Sede" class="venue">${m.venue}</td>
+      <td data-label="Apuestas"><div class="tags">${buildTags()}</div></td>
     </tr>
   `).join('');
 }
