@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mundial 2026 — Fase de Grupos | Apuestas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f4f3ef;
+      --surface:   #ffffff;
+      --border:    #e2e1da;
+      --border2:   #cccbc2;
+      --text:      #1a1a18;
+      --muted:     #6b6a63;
+      --accent:    #1a1a18;
+
+      --blue-bg:   #ddeeff; --blue-text: #0a4a8a; --blue-border: #aaccee;
+      --green-bg:  #dff4e0; --green-text: #1a6b22; --green-border: #9fd9a3;
+      --amber-bg:  #fef3d0; --amber-text: #7a4f00; --amber-border: #f5d06a;
+      --purple-bg: #ece9fd; --purple-text: #3d2fa0; --purple-border: #c4bdf5;
+      --pink-bg:   #fde8f2; --pink-text:  #8b1d54; --pink-border:  #f0aed0;
+      --teal-bg:   #d8f5ee; --teal-text:  #0a5e45; --teal-border:  #8dd8c6;
+      --red-bg:    #fde8e8; --red-text:   #8b1a1a; --red-border:   #f0aeae;
+      --gray-bg:   #ebebeb; --gray-text:  #444440; --gray-border:  #ccccca;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    header {
+      max-width: 1100px;
+      margin: 0 auto 2rem;
+    }
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .controls {
+      max-width: 1100px;
+      margin: 0 auto 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .controls label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .controls select,
+    .controls input[type="text"] {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .controls select:focus,
+    .controls input:focus { border-color: var(--accent); }
+    .controls input[type="text"] { width: 190px; }
+
+    .card {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    thead tr {
+      background: #f9f8f5;
+      border-bottom: 1px solid var(--border);
+    }
+    thead th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fafaf7; }
+    td {
+      padding: 10px 14px;
+      vertical-align: middle;
+    }
+
+    /* Group badge */
+    .grp {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .match-name {
+      font-weight: 500;
+      font-size: 0.84rem;
+      white-space: nowrap;
+    }
+    .vs { color: var(--muted); font-weight: 400; margin: 0 4px; font-size: 0.78rem; }
+
+    .time-cell {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .date-sub {
+      font-size: 0.7rem;
+      color: #aaa;
+    }
+
+    .venue {
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 99px;
+      font-size: 0.71rem;
+      font-weight: 500;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    .t-result  { background: var(--blue-bg);   color: var(--blue-text);   border-color: var(--blue-border); }
+    .t-goles   { background: var(--green-bg);  color: var(--green-text);  border-color: var(--green-border); }
+    .t-hcp     { background: var(--amber-bg);  color: var(--amber-text);  border-color: var(--amber-border); }
+    .t-ambos   { background: var(--purple-bg); color: var(--purple-text); border-color: var(--purple-border); }
+    .t-mitad   { background: var(--pink-bg);   color: var(--pink-text);   border-color: var(--pink-border); }
+    .t-corner  { background: var(--teal-bg);   color: var(--teal-text);   border-color: var(--teal-border); }
+    .t-tarjeta { background: var(--red-bg);    color: var(--red-text);    border-color: var(--red-border); }
+    .t-jugador { background: var(--gray-bg);   color: var(--gray-text);   border-color: var(--gray-border); }
+
+    .no-results {
+      padding: 2.5rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: none;
+    }
+    .footer-bar {
+      max-width: 1100px;
+      margin: 0.6rem auto 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* col widths */
+    th:nth-child(1) { width: 46px; }
+    th:nth-child(2) { width: 210px; }
+    th:nth-child(3) { width: 90px; }
+    th:nth-child(4) { width: 150px; }
+    th:nth-child(5) { }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Copa del Mundo 2026 — Fase de Grupos</h1>
+  <p>Todos los partidos · Hora Venezuela (VET, UTC-4) · Tipos de apuesta disponibles</p>
+</header>
+
+<div class="controls">
+  <label>Grupo</label>
+  <select id="filterGroup">
+    <option value="">Todos</option>
+    <option>A</option><option>B</option><option>C</option><option>D</option>
+    <option>E</option><option>F</option><option>G</option><option>H</option>
+    <option>I</option><option>J</option><option>K</option><option>L</option>
+  </select>
+  <label>Fecha</label>
+  <select id="filterDate"><option value="">Todas</option></select>
+  <input type="text" id="searchTeam" placeholder="Buscar selección..." />
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Gr.</th>
+        <th>Partido</th>
+        <th>Hora VET</th>
+        <th>Sede</th>
+        <th>Tipos de apuesta</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-results" id="noResults">No se encontraron partidos con ese filtro.</div>
+</div>
+<p class="footer-bar" id="countLabel"></p>
+
+<script>
+const BETS = [
+  { cls: 't-result',  label: '1X2' },
+  { cls: 't-goles',   label: 'Goles +/-' },
+  { cls: 't-hcp',     label: 'Hándicap' },
+  { cls: 't-ambos',   label: 'Ambos anotan' },
+  { cls: 't-mitad',   label: '1er tiempo' },
+  { cls: 't-corner',  label: 'Córners' },
+  { cls: 't-tarjeta', label: 'Tarjetas' },
+  { cls: 't-jugador', label: 'Primer goleador' },
+];
+
+const matches = [
+  {g:'A', date:'11 jun', time:'15:00', home:'México',        away:'Sudáfrica',       venue:'Ciudad de México'},
+  {g:'A', date:'11 jun', time:'22:00', home:'Corea del Sur', away:'Chequia',         venue:'Guadalajara'},
+  {g:'B', date:'12 jun', time:'15:00', home:'Canadá',        away:'Bosnia & Herz.',  venue:'Toronto'},
+  {g:'D', date:'12 jun', time:'21:00', home:'EE.UU.',        away:'Paraguay',        venue:'Los Ángeles'},
+  {g:'B', date:'13 jun', time:'15:00', home:'Catar',         away:'Suiza',           venue:'San Francisco'},
+  {g:'C', date:'13 jun', time:'18:00', home:'Brasil',        away:'Marruecos',       venue:'Nueva York/NJ'},
+  {g:'C', date:'13 jun', time:'21:00', home:'Haití',         away:'Escocia',         venue:'Boston'},
+  {g:'D', date:'13 jun', time:'00:00', home:'Australia',     away:'Turquía',         venue:'Vancouver'},
+  {g:'E', date:'14 jun', time:'13:00', home:'Alemania',      away:'Curazao',         venue:'Houston'},
+  {g:'F', date:'14 jun', time:'16:00', home:'Países Bajos',  away:'Japón',           venue:'Dallas'},
+  {g:'E', date:'14 jun', time:'19:00', home:'C. de Marfil',  away:'Ecuador',         venue:'Filadelfia'},
+  {g:'F', date:'14 jun', time:'22:00', home:'Suecia',        away:'Túnez',           venue:'Monterrey'},
+  {g:'H', date:'15 jun', time:'12:00', home:'España',        away:'Cabo Verde',      venue:'Atlanta'},
+  {g:'G', date:'15 jun', time:'15:00', home:'Bélgica',       away:'Egipto',          venue:'Seattle'},
+  {g:'H', date:'15 jun', time:'18:00', home:'Arabia Saudita',away:'Uruguay',         venue:'Miami'},
+  {g:'G', date:'15 jun', time:'21:00', home:'Irán',          away:'Nueva Zelanda',   venue:'Los Ángeles'},
+  {g:'I', date:'16 jun', time:'15:00', home:'Francia',       away:'Senegal',         venue:'Nueva York/NJ'},
+  {g:'I', date:'16 jun', time:'18:00', home:'Irak',          away:'Noruega',         venue:'Boston'},
+  {g:'J', date:'16 jun', time:'21:00', home:'Argentina',     away:'Argelia',         venue:'Kansas City'},
+  {g:'J', date:'16 jun', time:'00:00', home:'Austria',       away:'Jordania',        venue:'San Francisco'},
+  {g:'K', date:'17 jun', time:'13:00', home:'Portugal',      away:'RD Congo',        venue:'Houston'},
+  {g:'L', date:'17 jun', time:'16:00', home:'Inglaterra',    away:'Croacia',         venue:'Dallas'},
+  {g:'L', date:'17 jun', time:'19:00', home:'Ghana',         away:'Panamá',          venue:'Toronto'},
+  {g:'K', date:'17 jun', time:'22:00', home:'Uzbekistán',    away:'Colombia',        venue:'Ciudad de México'},
+  {g:'A', date:'18 jun', time:'12:00', home:'Chequia',       away:'Sudáfrica',       venue:'Atlanta'},
+  {g:'B', date:'18 jun', time:'15:00', home:'Suiza',         away:'Bosnia & Herz.',  venue:'Los Ángeles'},
+  {g:'B', date:'18 jun', time:'18:00', home:'Canadá',        away:'Catar',           venue:'Vancouver'},
+  {g:'A', date:'18 jun', time:'21:00', home:'México',        away:'Corea del Sur',   venue:'Guadalajara'},
+  {g:'D', date:'19 jun', time:'15:00', home:'EE.UU.',        away:'Australia',       venue:'Seattle'},
+  {g:'C', date:'19 jun', time:'18:00', home:'Escocia',       away:'Marruecos',       venue:'Boston'},
+  {g:'C', date:'19 jun', time:'21:00', home:'Brasil',        away:'Haití',           venue:'Filadelfia'},
+  {g:'D', date:'19 jun', time:'00:00', home:'Turquía',       away:'Paraguay',        venue:'San Francisco'},
+  {g:'F', date:'20 jun', time:'13:00', home:'Países Bajos',  away:'Suecia',          venue:'Houston'},
+  {g:'E', date:'20 jun', time:'16:00', home:'Alemania',      away:'C. de Marfil',    venue:'Toronto'},
+  {g:'E', date:'20 jun', time:'20:00', home:'Ecuador',       away:'Curazao',         venue:'Kansas City'},
+  {g:'F', date:'20 jun', time:'00:00', home:'Túnez',         away:'Japón',           venue:'Monterrey'},
+  {g:'H', date:'21 jun', time:'12:00', home:'España',        away:'Arabia Saudita',  venue:'Atlanta'},
+  {g:'G', date:'21 jun', time:'15:00', home:'Bélgica',       away:'Irán',            venue:'Los Ángeles'},
+  {g:'H', date:'21 jun', time:'18:00', home:'Uruguay',       away:'Cabo Verde',      venue:'Miami'},
+  {g:'G', date:'21 jun', time:'21:00', home:'Nueva Zelanda', away:'Egipto',          venue:'Vancouver'},
+  {g:'J', date:'22 jun', time:'13:00', home:'Argentina',     away:'Austria',         venue:'Dallas'},
+  {g:'I', date:'22 jun', time:'17:00', home:'Francia',       away:'Irak',            venue:'Filadelfia'},
+  {g:'I', date:'22 jun', time:'20:00', home:'Noruega',       away:'Senegal',         venue:'Nueva York/NJ'},
+  {g:'J', date:'22 jun', time:'23:00', home:'Jordania',      away:'Argelia',         venue:'San Francisco'},
+  {g:'K', date:'23 jun', time:'13:00', home:'Portugal',      away:'Uzbekistán',      venue:'Houston'},
+  {g:'L', date:'23 jun', time:'16:00', home:'Inglaterra',    away:'Ghana',           venue:'Boston'},
+  {g:'L', date:'23 jun', time:'19:00', home:'Panamá',        away:'Croacia',         venue:'Toronto'},
+  {g:'K', date:'23 jun', time:'22:00', home:'Colombia',      away:'RD Congo',        venue:'Guadalajara'},
+  {g:'B', date:'24 jun', time:'15:00', home:'Suiza',         away:'Canadá',          venue:'Vancouver'},
+  {g:'B', date:'24 jun', time:'15:00', home:'Bosnia & Herz.',away:'Catar',           venue:'Seattle'},
+  {g:'C', date:'24 jun', time:'18:00', home:'Escocia',       away:'Brasil',          venue:'Miami'},
+  {g:'C', date:'24 jun', time:'18:00', home:'Marruecos',     away:'Haití',           venue:'Atlanta'},
+  {g:'A', date:'24 jun', time:'21:00', home:'Chequia',       away:'México',          venue:'Ciudad de México'},
+  {g:'A', date:'24 jun', time:'21:00', home:'Sudáfrica',     away:'Corea del Sur',   venue:'Monterrey'},
+  {g:'E', date:'25 jun', time:'16:00', home:'Curazao',       away:'C. de Marfil',    venue:'Filadelfia'},
+  {g:'E', date:'25 jun', time:'16:00', home:'Ecuador',       away:'Alemania',        venue:'Nueva York/NJ'},
+  {g:'F', date:'25 jun', time:'19:00', home:'Japón',         away:'Suecia',          venue:'Dallas'},
+  {g:'F', date:'25 jun', time:'19:00', home:'Túnez',         away:'Países Bajos',    venue:'Kansas City'},
+  {g:'D', date:'25 jun', time:'22:00', home:'Turquía',       away:'EE.UU.',          venue:'Los Ángeles'},
+  {g:'D', date:'25 jun', time:'22:00', home:'Paraguay',      away:'Australia',       venue:'San Francisco'},
+  {g:'I', date:'26 jun', time:'15:00', home:'Noruega',       away:'Francia',         venue:'Boston'},
+  {g:'I', date:'26 jun', time:'15:00', home:'Senegal',       away:'Irak',            venue:'Toronto'},
+  {g:'H', date:'26 jun', time:'20:00', home:'Cabo Verde',    away:'Arabia Saudita',  venue:'Houston'},
+  {g:'H', date:'26 jun', time:'20:00', home:'Uruguay',       away:'España',          venue:'Guadalajara'},
+  {g:'G', date:'26 jun', time:'23:00', home:'Egipto',        away:'Irán',            venue:'Seattle'},
+  {g:'G', date:'26 jun', time:'23:00', home:'Nueva Zelanda', away:'Bélgica',         venue:'Vancouver'},
+  {g:'L', date:'27 jun', time:'17:00', home:'Panamá',        away:'Inglaterra',      venue:'Nueva York/NJ'},
+  {g:'L', date:'27 jun', time:'17:00', home:'Croacia',       away:'Ghana',           venue:'Filadelfia'},
+  {g:'K', date:'27 jun', time:'19:30', home:'Colombia',      away:'Portugal',        venue:'Miami'},
+  {g:'K', date:'27 jun', time:'19:30', home:'RD Congo',      away:'Uzbekistán',      venue:'Atlanta'},
+  {g:'J', date:'27 jun', time:'22:00', home:'Argelia',       away:'Austria',         venue:'Kansas City'},
+  {g:'J', date:'27 jun', time:'22:00', home:'Jordania',      away:'Argentina',       venue:'Dallas'},
+];
+
+// Populate date filter
+const dates = [...new Set(matches.map(m => m.date))];
+const dateSelect = document.getElementById('filterDate');
+dates.forEach(d => {
+  const o = document.createElement('option');
+  o.value = d; o.textContent = d;
+  dateSelect.appendChild(o);
+});
+
+function buildTags() {
+  return BETS.map(b => `<span class="tag ${b.cls}">${b.label}</span>`).join('');
+}
+
+function render() {
+  const gFilter = document.getElementById('filterGroup').value;
+  const dFilter = document.getElementById('filterDate').value;
+  const search  = document.getElementById('searchTeam').value.toLowerCase().trim();
+
+  const filtered = matches.filter(m => {
+    if (gFilter && m.g !== gFilter) return false;
+    if (dFilter && m.date !== dFilter) return false;
+    if (search && !m.home.toLowerCase().includes(search) && !m.away.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  const tbody   = document.getElementById('tableBody');
+  const noRes   = document.getElementById('noResults');
+  const countEl = document.getElementById('countLabel');
+
+  if (!filtered.length) {
+    tbody.innerHTML = '';
+    noRes.style.display = 'block';
+    countEl.textContent = '';
+    return;
+  }
+
+  noRes.style.display = 'none';
+  countEl.textContent = `${filtered.length} partido${filtered.length !== 1 ? 's' : ''} mostrado${filtered.length !== 1 ? 's' : ''}`;
+
+  tbody.innerHTML = filtered.map(m => `
+    <tr>
+      <td><span class="grp">${m.g}</span></td>
+      <td class="match-name">${m.home} <span class="vs">vs</span> ${m.away}</td>
+      <td class="time-cell">
+        ${m.time}<br>
+        <span class="date-sub">${m.date}</span>
+      </td>
+      <td class="venue">${m.venue}</td>
+      <td><div class="tags">${buildTags()}</div></td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('filterGroup').addEventListener('change', render);
+document.getElementById('filterDate').addEventListener('change', render);
+document.getElementById('searchTeam').addEventListener('input', render);
+
+render();
+</script>
+</body>
+</html>
