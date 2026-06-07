@@ -1,14 +1,14 @@
 const express = require('express');
 const pool    = require('../db');
-
+ 
 const router = express.Router();
-
+ 
 const ODDS_API_KEY = process.env.ODDS_API_KEY;
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hora
 const SPORT        = 'soccer_fifa_world_cup';
 const REGIONS      = 'us';
-const MARKETS      = 'h2h,totals,btts,spreads,h2h_3_way_h1';
-
+const MARKETS      = 'h2h,totals';
+ 
 // Mapa de nombres en inglés (API) → español (frontend)
 const NAME_MAP = {
   'Mexico':               'México',
@@ -94,24 +94,24 @@ const NAME_MAP = {
   'Thailand':             'Tailandia',
   'India':                'India',
 };
-
+ 
 function toSpanish(name) {
   return NAME_MAP[name] || name;
 }
-
+ 
 // ── GET /api/odds ─────────────────────────────────────────────────────────────
 router.get('/', async (req, res) => {
   try {
     const cached = await pool.query(
       'SELECT * FROM odds_cache ORDER BY match_date, home'
     );
-
+ 
     const now        = Date.now();
     const lastFetch  = cached.rows[0]?.fetched_at
       ? new Date(cached.rows[0].fetched_at).getTime()
       : 0;
     const cacheStale = (now - lastFetch) > CACHE_TTL_MS;
-
+ 
     if (!cacheStale && cached.rows.length > 0) {
       return res.json({
         source:     'cache',
@@ -119,7 +119,7 @@ router.get('/', async (req, res) => {
         odds:       formatOdds(cached.rows),
       });
     }
-
+ 
     if (!ODDS_API_KEY) {
       return res.json({
         source:     'cache_stale',
@@ -127,10 +127,10 @@ router.get('/', async (req, res) => {
         odds:       formatOdds(cached.rows),
       });
     }
-
+ 
     const apiUrl = `https://api.the-odds-api.com/v4/sports/${SPORT}/odds/?apiKey=${ODDS_API_KEY}&regions=${REGIONS}&markets=${MARKETS}&oddsFormat=american&dateFormat=iso`;
     const apiRes = await fetch(apiUrl);
-
+ 
     if (!apiRes.ok) {
       console.error('Odds API error:', apiRes.status);
       return res.json({
@@ -139,10 +139,10 @@ router.get('/', async (req, res) => {
         odds:       formatOdds(cached.rows),
       });
     }
-
+ 
     const games = await apiRes.json();
     console.log(`Odds API: ${games.length} partidos recibidos`);
-
+ 
     for (const game of games) {
       const homeEs    = toSpanish(game.home_team);
       const awayEs    = toSpanish(game.away_team);
@@ -152,7 +152,7 @@ router.get('/', async (req, res) => {
       const oddsBtts     = extractBTTS(game);
       const oddsHandicap = extractHandicap(game);
       const oddsFirstHalf = extractFirstHalf(game);
-
+ 
       await pool.query(
         `INSERT INTO odds_cache (match_key, home, away, match_date, odds_1x2, odds_goals, odds_btts, odds_handicap, odds_firsthalf, raw_data, fetched_at, updated_at)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW(),NOW())
@@ -172,23 +172,23 @@ router.get('/', async (req, res) => {
         ]
       );
     }
-
+ 
     const updated = await pool.query(
       'SELECT * FROM odds_cache ORDER BY match_date, home'
     );
-
+ 
     res.json({
       source:     'api_fresh',
       fetched_at: new Date().toISOString(),
       odds:       formatOdds(updated.rows),
     });
-
+ 
   } catch (err) {
     console.error('GET /api/odds error:', err);
     res.status(500).json({ error: 'Error al obtener cuotas' });
   }
 });
-
+ 
 // ── GET /api/odds/remaining ───────────────────────────────────────────────────
 router.get('/remaining', async (req, res) => {
   if (!ODDS_API_KEY)
@@ -202,7 +202,7 @@ router.get('/remaining', async (req, res) => {
     res.status(500).json({ error: 'Error al consultar requests restantes' });
   }
 });
-
+ 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function buildMatchKey(home, away) {
   return `${home}_${away}`.toLowerCase()
@@ -212,12 +212,12 @@ function buildMatchKey(home, away) {
     .replace(/[úùü]/g, 'u').replace(/ñ/g, 'n')
     .replace(/[^a-z0-9_&]/g, '');
 }
-
+ 
 function extractH2H(game) {
   // Tomar el promedio de todas las casas disponibles para mayor precisión
   const bookmakers = game.bookmakers || [];
   let homeTotal = 0, drawTotal = 0, awayTotal = 0, count = 0;
-
+ 
   for (const bk of bookmakers) {
     const market = bk.markets?.find(m => m.key === 'h2h');
     if (!market) continue;
@@ -229,7 +229,7 @@ function extractH2H(game) {
       count++;
     }
   }
-
+ 
   if (count === 0) return null;
   return {
     home: parseFloat((homeTotal / count).toFixed(2)),
@@ -237,11 +237,11 @@ function extractH2H(game) {
     away: parseFloat((awayTotal / count).toFixed(2)),
   };
 }
-
+ 
 function extractTotals(game) {
   const bookmakers = game.bookmakers || [];
   let over25Total = 0, under25Total = 0, count = 0;
-
+ 
   for (const bk of bookmakers) {
     const market = bk.markets?.find(m => m.key === 'totals');
     if (!market) continue;
@@ -252,7 +252,7 @@ function extractTotals(game) {
       count++;
     }
   }
-
+ 
   if (count === 0) return null;
   return {
     over25:  parseFloat((over25Total / count).toFixed(2)),
@@ -260,11 +260,11 @@ function extractTotals(game) {
     point:   2.5,
   };
 }
-
+ 
 function extractHandicap(game) {
   const bookmakers = game.bookmakers || [];
   let homeTotal = 0, awayTotal = 0, homePoint = 0, count = 0;
-
+ 
   for (const bk of bookmakers) {
     const market = bk.markets?.find(m => m.key === 'spreads');
     if (!market) continue;
@@ -276,7 +276,7 @@ function extractHandicap(game) {
       count++;
     }
   }
-
+ 
   if (count === 0) return null;
   return {
     home:  parseFloat((homeTotal / count).toFixed(2)),
@@ -284,11 +284,11 @@ function extractHandicap(game) {
     point: parseFloat((homePoint / count).toFixed(1)),
   };
 }
-
+ 
 function extractFirstHalf(game) {
   const bookmakers = game.bookmakers || [];
   let homeTotal = 0, drawTotal = 0, awayTotal = 0, count = 0;
-
+ 
   for (const bk of bookmakers) {
     const market = bk.markets?.find(m => m.key === 'h2h_3_way_h1');
     if (!market) continue;
@@ -300,7 +300,7 @@ function extractFirstHalf(game) {
       count++;
     }
   }
-
+ 
   if (count === 0) return null;
   return {
     home: parseFloat((homeTotal / count).toFixed(2)),
@@ -308,11 +308,11 @@ function extractFirstHalf(game) {
     away: parseFloat((awayTotal / count).toFixed(2)),
   };
 }
-
+ 
 function extractBTTS(game) {
   const bookmakers = game.bookmakers || [];
   let yesTotal = 0, noTotal = 0, count = 0;
-
+ 
   for (const bk of bookmakers) {
     const market = bk.markets?.find(m => m.key === 'btts');
     if (!market) continue;
@@ -323,14 +323,14 @@ function extractBTTS(game) {
       count++;
     }
   }
-
+ 
   if (count === 0) return null;
   return {
     yes: parseFloat((yesTotal / count).toFixed(2)),
     no:  parseFloat((noTotal / count).toFixed(2)),
   };
 }
-
+ 
 function formatOdds(rows) {
   const result = {};
   for (const row of rows) {
@@ -341,12 +341,9 @@ function formatOdds(rows) {
       fetched_at: row.fetched_at,
       '1x2':      row.odds_1x2,
       goals:      row.odds_goals,
-      btts:       row.odds_btts,
-      handicap:   row.odds_handicap,
-      firsthalf:  row.odds_firsthalf,
     };
   }
   return result;
 }
-
+ 
 module.exports = router;
