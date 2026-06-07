@@ -6,8 +6,8 @@ const router = express.Router();
 const ODDS_API_KEY = process.env.ODDS_API_KEY;
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hora
 const SPORT        = 'soccer_fifa_world_cup';
-const REGIONS      = 'eu';
-const MARKETS      = 'h2h,totals,btts';
+const REGIONS      = 'us';
+const MARKETS      = 'h2h';
 
 // Mapa de nombres en inglés (API) → español (frontend)
 const NAME_MAP = {
