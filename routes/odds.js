@@ -128,7 +128,7 @@ router.get('/', async (req, res) => {
       });
     }
 
-    const apiUrl = `https://api.the-odds-api.com/v4/sports/${SPORT}/odds/?apiKey=${ODDS_API_KEY}&regions=${REGIONS}&markets=${MARKETS}&oddsFormat=decimal&dateFormat=iso`;
+    const apiUrl = `https://api.the-odds-api.com/v4/sports/${SPORT}/odds/?apiKey=${ODDS_API_KEY}&regions=${REGIONS}&markets=${MARKETS}&oddsFormat=moneyline&dateFormat=iso`;
     const apiRes = await fetch(apiUrl);
 
     if (!apiRes.ok) {
